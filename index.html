@@ -317,6 +317,28 @@ footer {
 
 </section>
 
+
+<section class="checker-section" id="news-checker">
+  <h2>📰 TruthTrace News Verification</h2>
+  <p>Check a news claim and review its credibility.</p>
+
+  <div class="checker-card">
+    <h3>Enter News Claim</h3>
+
+    <textarea
+      id="newsInput"
+      placeholder="Paste a news headline or claim here..."
+      rows="4"
+    ></textarea>
+
+    <button onclick="checkNews()">
+      Verify News
+    </button>
+
+    <div id="newsResult"></div>
+  </div>
+</section>
+
 <footer>
   © 2026 TruthTrace AI. All Rights Reserved.
   <br><br>
@@ -337,6 +359,24 @@ function checkAccount() {
     "Demo interface only. Real AI verification is not connected yet. " +
     "Account submitted: " + account.replace(/[&<>"']/g, "");
 }
+
+function checkNews() {
+  const news = document.getElementById("newsInput").value.trim();
+  const result = document.getElementById("newsResult");
+
+  if (news.length < 15) {
+    result.textContent =
+      "Please enter a complete news headline or claim.";
+    return;
+  }
+
+  result.textContent =
+    "Claim received successfully. Status: Needs Verification. " +
+    "This prototype has not yet checked independent sources. " +
+    "Compare the claim with multiple reliable news sources " +
+    "before treating it as true.";
+}
+
 </script>
 
 </body>
