@@ -410,22 +410,69 @@ footer {
 </footer>
 
 <script>
-function checkAccount() {
-  const account = document.getElementById("account").value.trim();
+
+const API_URL = "https://truthtrace-ai-backend.onrender.com";
+
+// Common function to connect with Gemini AI
+async function analyzeWithAI(text) {
+  const response = await fetch(`${API_URL}/api/analyze`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ text: text })
+  });
+
+  if (!response.ok) {
+    throw new Error(`AI server error: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.success || !data.analysis) {
+    throw new Error("AI analysis could not be completed.");
+  }
+
+  return data.analysis;
+}
+
+// Account credibility analysis
+async function checkAccount() {
+  const account = document
+    .getElementById("account").value.trim();
+
   const result = document.getElementById("result");
 
   if (!account) {
-    result.innerText = "Please enter an account name or URL.";
+    result.textContent =
+      "Please enter an account name or URL.";
     return;
   }
 
-  result.innerHTML =
-    "Demo interface only. Real AI verification is not connected yet. " +
-    "Account submitted: " + account.replace(/[&<>"']/g, "");
+  result.textContent = "Analyzing account with TruthTrace AI...";
+
+  try {
+    const analysis = await analyzeWithAI(
+      "Analyze this social media account or account URL for credibility indicators. " +
+      "Account: " + account +
+      ". Do not claim to have accessed or verified the actual account. " +
+      "Explain what can and cannot be established from the supplied information."
+    );
+
+    result.textContent = analysis;
+
+  } catch (error) {
+    console.error(error);
+    result.textContent =
+      "Unable to analyze account. Please try again later.";
+  }
 }
 
-function checkNews() {
-  const news = document.getElementById("newsInput").value.trim();
+// News credibility analysis
+async function checkNews() {
+  const news = document
+    .getElementById("newsInput").value.trim();
+
   const result = document.getElementById("newsResult");
 
   if (news.length < 15) {
@@ -434,12 +481,26 @@ function checkNews() {
     return;
   }
 
-  result.textContent =
-    "Claim received successfully. Status: Needs Verification. " +
-    "This prototype has not yet checked independent sources. " +
-    "Compare the claim with multiple reliable news sources " +
-    "before treating it as true.";
+  result.textContent = "Analyzing news claim with TruthTrace AI...";
+
+  try {
+    const analysis = await analyzeWithAI(
+      "Analyze this news headline or claim for credibility. " +
+      "Identify the main claim, possible misinformation indicators, " +
+      "missing context and evidence needed. Do not invent sources " +
+      "or claim independent verification. " +
+      "News claim: " + news
+    );
+
+    result.textContent = analysis;
+
+  } catch (error) {
+    console.error(error);
+    result.textContent =
+      "Unable to analyze news. Please try again later.";
+  }
 }
+
 
 </script>
 
