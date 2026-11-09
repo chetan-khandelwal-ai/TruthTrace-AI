@@ -84,9 +84,14 @@ Do not claim that something is fake without evidence.
             "analysis": response.text
         }
 
-    except Exception:
+    
+    except Exception as e:
+        print(
+            f"AI GENERATION ERROR: {type(e).__name__}: {e}",
+            flush=True
+        )
         raise HTTPException(
             status_code=502,
-            detail="AI analysis failed. Please try again."
+            detail="AI analysis failed. Check backend logs."
         )
 
