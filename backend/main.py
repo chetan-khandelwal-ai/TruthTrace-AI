@@ -23,7 +23,7 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
-MODEL = "gemini-3.8-flash"
+MODEL = "gemini-3.7-flash"
 
 
 class AnalysisRequest(BaseModel):
