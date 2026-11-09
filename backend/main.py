@@ -23,8 +23,10 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
-MODEL = "gemini-3.7-flash"
-
+MODEL_FALLBACKS = [
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite"
+]
 
 class AnalysisRequest(BaseModel):
     text: str = Field(min_length=10, max_length=10000)
@@ -73,25 +75,43 @@ Clearly distinguish verified facts from uncertainty.
 Do not claim that something is fake without evidence.
 """
 
+    
+models_to_try = [
+    MODEL,
+    "gemini-2.5-flash",
+    "gemini-2.0-flash"
+]
+
+last_error = None
+
+for model_name in models_to_try:
     try:
+        print(f"Trying AI model: {model_name}", flush=True)
+
         response = client.models.generate_content(
-            model=MODEL,
+            model=model_name,
             contents=prompt
         )
 
-        return {
-            "success": True,
-            "analysis": response.text
-        }
+        if response.text:
+            return {
+                "success": True,
+                "analysis": response.text,
+                "model_used": model_name
+            }
 
-    
+        last_error = "Empty AI response"
+
     except Exception as e:
+        last_error = e
+
         print(
-            f"AI GENERATION ERROR: {type(e).__name__}: {e}",
+            f"MODEL FAILED: {model_name}: {type(e).__name__}: {e}",
             flush=True
         )
-        raise HTTPException(
-            status_code=502,
-            detail="AI analysis failed. Check backend logs."
-        )
+
+raise HTTPException(
+    status_code=503,
+    detail="All available AI models are temporarily unavailable. Please retry."
+)
 
